@@ -13,35 +13,32 @@ package oss_warpper
 import (
 	"fmt"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"os"
 )
 
-func HandleError(err error) {
-	fmt.Println("Error:", err)
-	os.Exit(-1)
-}
-
-func GetBucket(ossEndPoint string, ossAccessKeyId string, ossAccessKeySecret string, bucketName string) *oss.Bucket {
+func GetBucket(ossEndPoint string, ossAccessKeyId string, ossAccessKeySecret string, bucketName string) (bool, *oss.Bucket) {
 
 	client, err := oss.New(ossEndPoint, ossAccessKeyId, ossAccessKeySecret)
 
 	if err != nil {
-		HandleError(err)
+		fmt.Println(err)
+		return false, nil
 	}
 
 	bucket, err := client.Bucket(bucketName)
 	if err != nil {
-		HandleError(err)
+		fmt.Println(err)
+		return false, nil
 	}
-	return bucket
+	return true, bucket
 }
 
-func DownloadObjectFromOss(bucket *oss.Bucket, objectName string, outputFileName string) {
+func DownloadObjectFromOss(bucket *oss.Bucket, objectName string, outputFileName string) bool {
 
 	// 判断文件是否存在。
 	isExist, err := bucket.IsObjectExist(objectName)
 	if err != nil {
-		HandleError(err)
+		fmt.Println(err)
+		return false
 	}
 
 	if isExist {
@@ -49,24 +46,27 @@ func DownloadObjectFromOss(bucket *oss.Bucket, objectName string, outputFileName
 		// 下载文件。
 		err := bucket.GetObjectToFile(objectName, outputFileName)
 		if err != nil {
-			HandleError(err)
+			fmt.Println(err)
 		}
+		return true
 	}
+	return false
 
 }
 
-func IsExist(bucket *oss.Bucket, objectName string) (bool, error){
+func IsExist(bucket *oss.Bucket, objectName string) (bool, error) {
 	isExist, err := bucket.IsObjectExist(objectName)
 	return isExist, err
 }
 
-func ListObjects(bucket *oss.Bucket, marker string) []string {
+func ListObjects(bucket *oss.Bucket, marker string) (bool, []string) {
 	// 列举所有文件。
 	objectsPaths := []string{}
 	for {
 		lsRes, err := bucket.ListObjects(oss.Marker(marker))
 		if err != nil {
-			HandleError(err)
+			fmt.Println(err)
+			return false, nil
 		}
 
 		// 打印列举文件，默认情况下一次返回100条记录。
@@ -81,6 +81,5 @@ func ListObjects(bucket *oss.Bucket, marker string) []string {
 			break
 		}
 	}
-	return objectsPaths
+	return true, objectsPaths
 }
-
