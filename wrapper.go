@@ -45,7 +45,7 @@ func DownloadObjectFromOss(bucket *oss.Bucket, objectName string, outputFileName
 
 		// 下载文件。
 		err := bucket.GetObjectToFile(objectName, outputFileName)
-		if err != nil {Key
+		if err != nil {
 			fmt.Println(err)
 		}
 		return true
