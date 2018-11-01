@@ -8,28 +8,28 @@
 
 这一行开始写关于本文件的说明与解释 
 */
-package oss_warpper
+package oss_wrapper
 
 import (
 	"fmt"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
 
-func GetBucket(ossEndPoint string, ossAccessKeyId string, ossAccessKeySecret string, bucketName string) (bool, *oss.Bucket) {
+func GetBucket(ossEndPoint string, ossAccessKeyId string, ossAccessKeySecret string, bucketName string) (*oss.Bucket, bool) {
 
 	client, err := oss.New(ossEndPoint, ossAccessKeyId, ossAccessKeySecret)
 
 	if err != nil {
 		fmt.Println(err)
-		return false, nil
+		return nil, false
 	}
 
 	bucket, err := client.Bucket(bucketName)
 	if err != nil {
 		fmt.Println(err)
-		return false, nil
+		return nil, false
 	}
-	return true, bucket
+	return bucket, true
 }
 
 func DownloadObjectFromOss(bucket *oss.Bucket, objectName string, outputFileName string) bool {
@@ -45,7 +45,7 @@ func DownloadObjectFromOss(bucket *oss.Bucket, objectName string, outputFileName
 
 		// 下载文件。
 		err := bucket.GetObjectToFile(objectName, outputFileName)
-		if err != nil {
+		if err != nil {Key
 			fmt.Println(err)
 		}
 		return true
@@ -59,14 +59,14 @@ func IsExist(bucket *oss.Bucket, objectName string) (bool, error) {
 	return isExist, err
 }
 
-func ListObjects(bucket *oss.Bucket, marker string) (bool, []string) {
+func ListObjects(bucket *oss.Bucket, marker string) ([]string, bool) {
 	// 列举所有文件。
 	objectsPaths := []string{}
 	for {
 		lsRes, err := bucket.ListObjects(oss.Marker(marker))
 		if err != nil {
 			fmt.Println(err)
-			return false, nil
+			return nil, false
 		}
 
 		// 打印列举文件，默认情况下一次返回100条记录。
@@ -81,5 +81,5 @@ func ListObjects(bucket *oss.Bucket, marker string) (bool, []string) {
 			break
 		}
 	}
-	return true, objectsPaths
+	return objectsPaths, true
 }
