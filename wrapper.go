@@ -3,7 +3,7 @@
 @contact: berryberryry@gmail.com
 @version: 1.0 
 @license: Apache Licence 
-@file: warpper.go 
+@file: wrapper.go
 @time: 18-11-1 下午8:02 
 
 这一行开始写关于本文件的说明与解释 
